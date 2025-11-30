@@ -35,7 +35,7 @@ export default function HRApplications() {
       console.log('HR ID:', hrId);
 
       // First get HR's jobs, then get applications for those jobs
-      const jobsRes = await fetch(`https://workin-slbh.onrender.com/api/jobs/hr/${hrId}`);
+      const jobsRes = await fetch(`http://localhost:8000/api/jobs/hr/${hrId}`);
       if (jobsRes.ok) {
         const jobs = await jobsRes.json();
         console.log('HR Jobs:', jobs);
@@ -44,7 +44,7 @@ export default function HRApplications() {
         const allApplications = [];
         for (const job of jobs) {
           console.log(`Fetching applications for job ${job.id}:`, job.title);
-          const appRes = await fetch(`https://workin-slbh.onrender.com/api/jobs/${job.id}/applications`);
+          const appRes = await fetch(`http://localhost:8000/api/jobs/${job.id}/applications`);
           if (appRes.ok) {
             const jobApplications = await appRes.json();
             console.log(`Applications for job ${job.id}:`, jobApplications);
@@ -67,7 +67,7 @@ export default function HRApplications() {
 
   const updateApplicationStatus = async (applicationId, status, response = '') => {
     try {
-      const res = await fetch(`https://workin-slbh.onrender.com/api/jobs/applications/${applicationId}/status`, {
+      const res = await fetch(`http://localhost:8000/api/jobs/applications/${applicationId}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status, response })

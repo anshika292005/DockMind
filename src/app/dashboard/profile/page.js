@@ -46,14 +46,14 @@ export default function Profile() {
       const userId = payload.userId;
 
       // Fetch user data
-      const userRes = await fetch(`https://workin-slbh.onrender.com/api/auth/user/${userId}`);
+      const userRes = await fetch(`http://localhost:8000/api/auth/user/${userId}`);
       if (userRes.ok) {
         const user = await userRes.json();
         setUserData({ name: user.name, email: user.email, phoneNumber: user.phoneNumber });
       }
 
       // Fetch profile data
-      const profileRes = await fetch(`https://workin-slbh.onrender.com/api/profile/${userId}`, {
+      const profileRes = await fetch(`http://localhost:8000/api/profile/${userId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
@@ -78,7 +78,7 @@ export default function Profile() {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const userId = payload.userId;
 
-      const res = await fetch(`https://workin-slbh.onrender.com/api/profile/${userId}`, {
+      const res = await fetch(`http://localhost:8000/api/profile/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
