@@ -32,7 +32,7 @@ export default function Applications() {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const candidateId = payload.userId;
 
-      const res = await fetch(`http://localhost:8000/api/jobs/applications/${candidateId}`);
+      const res = await fetch(`https://workin-2t5c.onrender.com/api/jobs/applications/${candidateId}`);
       if (res.ok) {
         const data = await res.json();
         setApplications(data);

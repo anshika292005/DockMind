@@ -15,7 +15,7 @@ export default function DashboardNavbar() {
           const payload = JSON.parse(atob(token.split('.')[1]));
           const userId = payload.userId;
           
-          const res = await fetch(`http://localhost:8000/api/auth/user/${userId}`);
+          const res = await fetch(`https://workin-2t5c.onrender.com/api/auth/user/${userId}`);
           if (res.ok) {
             const user = await res.json();
             setUserName(user.name);

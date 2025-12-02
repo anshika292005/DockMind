@@ -39,7 +39,7 @@ export default function CreateJob() {
       console.log('Sending job data:', job);
       console.log('HR ID:', hrId);
 
-      const res = await fetch(`http://localhost:8000/api/jobs/create/${hrId}`, {
+      const res = await fetch(`https://workin-2t5c.onrender.com/api/jobs/create/${hrId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
