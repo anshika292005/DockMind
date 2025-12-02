@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import DashboardNavbar from '../../../components/DashboardNavbar';
+import API from '@/lib/api';
 import Sidebar from '../../../components/Sidebar';
 
 export default function CreateJob() {
@@ -39,7 +40,7 @@ export default function CreateJob() {
       console.log('Sending job data:', job);
       console.log('HR ID:', hrId);
 
-      const res = await fetch(`https://workin-2t5c.onrender.com/api/jobs/create/${hrId}`, {
+      const res = await fetch(`${API}/api/jobs/create/${hrId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

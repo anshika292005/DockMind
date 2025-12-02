@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import DashboardNavbar from '../../../components/DashboardNavbar';
+import API from '@/lib/api';
 import Sidebar from '../../../components/Sidebar';
 
 export default function Applications() {
@@ -32,7 +33,7 @@ export default function Applications() {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const candidateId = payload.userId;
 
-      const res = await fetch(`https://workin-2t5c.onrender.com/api/jobs/applications/${candidateId}`);
+      const res = await fetch(`${API}/api/jobs/applications/${candidateId}`);
       if (res.ok) {
         const data = await res.json();
         setApplications(data);

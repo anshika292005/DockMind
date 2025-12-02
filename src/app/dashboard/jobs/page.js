@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import DashboardNavbar from '../../../components/DashboardNavbar';
+import API from '@/lib/api';
 import Sidebar from '../../../components/Sidebar';
 
 export default function Jobs() {
@@ -34,7 +35,7 @@ export default function Jobs() {
       if (search) params.append('search', search);
       if (location) params.append('location', location);
       
-      const res = await fetch(`https://workin-2t5c.onrender.com/api/jobs/?${params}`);
+      const res = await fetch(`${API}/api/jobs/?${params}`);
       if (res.ok) {
         const data = await res.json();
         setJobs(data);
@@ -59,7 +60,7 @@ export default function Jobs() {
 
       console.log('Applying for job:', { jobId, candidateId });
 
-      const res = await fetch(`https://workin-2t5c.onrender.com/api/jobs/apply/${jobId}/${candidateId}`, {
+      const res = await fetch(`${API}/api/jobs/apply/${jobId}/${candidateId}`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });

@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import API from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -14,7 +15,7 @@ export default function Login() {
     setError('');
 
     try {
-      const res = await fetch('https://workin-2t5c.onrender.com/api/auth/login', {
+      const res = await fetch(`${API}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import API from '@/lib/api';
 
 export default function DashboardNavbar() {
   const [userName, setUserName] = useState('');
@@ -15,7 +16,7 @@ export default function DashboardNavbar() {
           const payload = JSON.parse(atob(token.split('.')[1]));
           const userId = payload.userId;
           
-          const res = await fetch(`https://workin-2t5c.onrender.com/api/auth/user/${userId}`);
+          const res = await fetch(`${API}/api/auth/user/${userId}`);
           if (res.ok) {
             const user = await res.json();
             setUserName(user.name);

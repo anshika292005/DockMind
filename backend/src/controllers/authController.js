@@ -28,17 +28,13 @@ const signupUser = async (req, res) => {
     const tokens = generateToken(newUser.id);
     return res.status(201).json({ message: "User created successfully!", token: tokens.accessTokens });
   } catch (err) {
+      console.error('Signup error:', err);
     return res.status(500).json({ message: "Server Error!" });
   }
 };
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ message: "Email and password required!" });
-  }
-
   try {
     const user = await prisma.users.findFirst({ where: { email } });
     if (!user) {
@@ -53,6 +49,7 @@ const loginUser = async (req, res) => {
     const tokens = generateToken(user.id);
     return res.status(200).json({ message: "Login successful!", token: tokens.accessTokens, name: user.name, role: user.role });
   } catch (err) {
+    console.error('Login error:', err);
     return res.status(500).json({ message: "Server Error!" });
   }
 };
@@ -66,6 +63,7 @@ const getUser = async (req, res) => {
     }
     return res.status(200).json({ name: user.name, email: user.email, phoneNumber: user.phoneNumber });
   } catch (err) {
+      console.error('Get user error:', err);
     return res.status(500).json({ message: "Server Error!" });
   }
 };

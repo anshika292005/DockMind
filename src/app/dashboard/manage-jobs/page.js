@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import DashboardNavbar from '../../../components/DashboardNavbar';
+import API from '@/lib/api';
 import Sidebar from '../../../components/Sidebar';
 
 export default function ManageJobs() {
@@ -24,7 +25,7 @@ export default function ManageJobs() {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const hrId = payload.userId;
       
-      const res = await fetch(`https://workin-2t5c.onrender.com/api/jobs/hr/${hrId}`);
+      const res = await fetch(`${API}/api/jobs/hr/${hrId}`);
       if (res.ok) {
         const jobsData = await res.json();
         
@@ -32,7 +33,7 @@ export default function ManageJobs() {
         const jobsWithApplications = await Promise.all(
           jobsData.map(async (job) => {
             try {
-              const appRes = await fetch(`https://workin-2t5c.onrender.com/api/jobs/${job.id}/applications`);
+              const appRes = await fetch(`${API}/api/jobs/${job.id}/applications`);
               if (appRes.ok) {
                 const applications = await appRes.json();
                 return { ...job, applicationCount: applications.length };
@@ -57,7 +58,7 @@ export default function ManageJobs() {
     if (!confirm('Are you sure you want to delete this job?')) return;
     
     try {
-      const res = await fetch(`https://workin-2t5c.onrender.com/api/jobs/${jobId}`, {
+      const res = await fetch(`${API}/api/jobs/${jobId}`, {
         method: 'DELETE'
       });
       

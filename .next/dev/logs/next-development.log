@@ -1,0 +1,22 @@
+[00:00:03.112] Server  LOG      ✓ Ready in 2.9s
+[00:00:07.948] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:58.102] Server  LOG        Reload env: .env
+[00:00:58.169] Server  LOG        Reload env: .env
+[00:01:20.252] Server  LOG        Reload env: .env
+[00:01:37.096] Server  LOG        Reload env: .env.local
+[00:01:51.714] Server  LOG        Reload env: .env
+[00:04:17.072] Server  LOG        Reload env: .env
+[00:04:18.539] Server  LOG        Reload env: .env.local
+[00:04:18.676] Server  LOG      ✓ Compiled in 104ms
+[00:04:27.468] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:07:27.303] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:12:26.431] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:14:32.012] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:15:41.729] Browser LOG     User created successfully!
+[00:15:41.729] Browser LOG     JWT Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc2NDY3MzkwMSwiZXhwIjoxNzY0Njc3NTAxfQ.YXYZwFdl30ToIeM6tgc1fSo-v_bR1D57__sW3Jpxqic
+[00:15:47.320] Browser LOG     Login successful!
+[00:15:47.320] Browser LOG     JWT Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc2NDY3MzkwNiwiZXhwIjoxNzY0Njc3NTA2fQ.7M9FLQlVMF4bJwyO_McXfU3ThC64-QH2DToylocCibc
+[00:16:31.938] Browser LOG     Sending job data: {"company":"Starbucks","description":"Chill","location":"San Francisco, Sonipat","requirements":"Sleep","salary":"200","title":"Free Job","type":"part-time"}
+[00:16:31.938] Browser LOG     HR ID: 1
+[00:16:32.798] Browser LOG     Response status: 201
+[00:16:32.798] Browser LOG     Response data: {"job":{"company":"Starbucks","createdAt":"2025-12-02T11:12:31.456Z","description":"Chill","hrId":1,"id":1,"location":"San Francisco, Sonipat","requirements":"Sleep","salary":"200","title":"Free Job","type":"part-time","updatedAt":"2025-12-02T11:12:31.456Z"},"message":"Job created successfully"}
