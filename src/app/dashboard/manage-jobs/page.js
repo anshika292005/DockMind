@@ -25,18 +25,26 @@ export default function ManageJobs() {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const hrId = payload.userId;
       
-      const res = await fetch(`${API}/api/jobs/hr/${hrId}`);
+      const params = new URLSearchParams();
+      params.append('page', 1);
+      params.append('limit', 50);
+      params.append('sortBy', 'createdAt');
+      params.append('sortOrder', 'desc');
+      
+      const res = await fetch(`${API}/api/jobs/hr/${hrId}?${params}`);
       if (res.ok) {
-        const jobsData = await res.json();
+        const data = await res.json();
+        const jobsData = data.jobs || data || [];
         
         // Fetch application counts for each job
         const jobsWithApplications = await Promise.all(
           jobsData.map(async (job) => {
             try {
-              const appRes = await fetch(`${API}/api/jobs/${job.id}/applications`);
+              const appRes = await fetch(`${API}/api/jobs/${job.id}/applications?limit=1`);
               if (appRes.ok) {
-                const applications = await appRes.json();
-                return { ...job, applicationCount: applications.length };
+                const appData = await appRes.json();
+                const count = appData.pagination ? appData.pagination.total : (appData.applications ? appData.applications.length : appData.length);
+                return { ...job, applicationCount: count };
               }
             } catch (err) {
               console.error('Error fetching applications for job', job.id);
@@ -46,9 +54,13 @@ export default function ManageJobs() {
         );
         
         setJobs(jobsWithApplications);
+      } else {
+        console.error('Failed to fetch jobs:', res.status);
+        setJobs([]);
       }
     } catch (err) {
-      console.error('Error fetching jobs');
+      console.error('Error fetching jobs:', err);
+      setJobs([]);
     } finally {
       setLoading(false);
     }

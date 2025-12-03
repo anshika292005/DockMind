@@ -4,12 +4,19 @@ import { useRouter } from 'next/navigation';
 import DashboardNavbar from '../../../components/DashboardNavbar';
 import API from '@/lib/api';
 import Sidebar from '../../../components/Sidebar';
+import Pagination from '../../../components/Pagination';
 
 export default function Jobs() {
   const [jobs, setJobs] = useState([]);
   const [search, setSearch] = useState('');
   const [location, setLocation] = useState('');
+  const [company, setCompany] = useState('');
+  const [type, setType] = useState('');
+  const [sortBy, setSortBy] = useState('createdAt');
+  const [sortOrder, setSortOrder] = useState('desc');
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({ total: 0, pages: 0, limit: 10 });
   const router = useRouter();
 
   useEffect(() => {
@@ -29,19 +36,30 @@ export default function Jobs() {
     fetchJobs();
   }, [router]);
 
-  const fetchJobs = async () => {
+  const fetchJobs = async (page = currentPage) => {
     try {
       const params = new URLSearchParams();
       if (search) params.append('search', search);
       if (location) params.append('location', location);
+      if (company) params.append('company', company);
+      if (type) params.append('type', type);
+      params.append('sortBy', sortBy);
+      params.append('sortOrder', sortOrder);
+      params.append('page', page);
+      params.append('limit', pagination.limit);
       
       const res = await fetch(`${API}/api/jobs/?${params}`);
       if (res.ok) {
         const data = await res.json();
-        setJobs(data);
+        setJobs(data.jobs || []);
+        setPagination(data.pagination || { total: 0, pages: 0, limit: 10 });
+      } else {
+        console.error('Failed to fetch jobs:', res.status);
+        setJobs([]);
       }
     } catch (err) {
-      console.error('Error fetching jobs');
+      console.error('Error fetching jobs:', err);
+      setJobs([]);
     } finally {
       setLoading(false);
     }
@@ -49,16 +67,38 @@ export default function Jobs() {
 
   const handleSearch = () => {
     setLoading(true);
-    fetchJobs();
+    setCurrentPage(1);
+    fetchJobs(1);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    setLoading(true);
+    fetchJobs(page);
+  };
+
+  const clearFilters = () => {
+    setSearch('');
+    setLocation('');
+    setCompany('');
+    setType('');
+    setSortBy('createdAt');
+    setSortOrder('desc');
+    setCurrentPage(1);
+    setLoading(true);
+    fetchJobs(1);
   };
 
   const applyForJob = async (jobId) => {
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please login to apply for jobs');
+        return;
+      }
+      
       const payload = JSON.parse(atob(token.split('.')[1]));
       const candidateId = payload.userId;
-
-      console.log('Applying for job:', { jobId, candidateId });
 
       const res = await fetch(`${API}/api/jobs/apply/${jobId}/${candidateId}`, {
         method: 'POST',
@@ -66,16 +106,15 @@ export default function Jobs() {
       });
 
       const responseData = await res.json();
-      console.log('Application response:', responseData);
 
       if (res.ok) {
         alert('Application submitted successfully!');
       } else {
-        alert(responseData.message || 'Already applied or error occurred');
+        alert(responseData.message || 'Failed to apply for job');
       }
     } catch (err) {
       console.error('Error applying for job:', err);
-      alert('Error applying for job');
+      alert('Error applying for job. Please try again.');
     }
   };
 
@@ -88,7 +127,7 @@ export default function Jobs() {
           <h1 className="text-3xl font-bold text-gray-900 mb-8">Find Jobs</h1>
           
           <div className="bg-white rounded-lg shadow p-6 mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
               <input
                 type="text"
                 placeholder="Job title or keywords"
@@ -103,11 +142,61 @@ export default function Jobs() {
                 onChange={(e) => setLocation(e.target.value)}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+              <input
+                type="text"
+                placeholder="Company"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <select
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">All Job Types</option>
+                <option value="full-time">Full Time</option>
+                <option value="part-time">Part Time</option>
+                <option value="contract">Contract</option>
+                <option value="internship">Internship</option>
+              </select>
+            </div>
+            <div className="flex flex-wrap gap-4 items-center">
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700">Sort by:</label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="px-3 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="createdAt">Date Posted</option>
+                  <option value="title">Job Title</option>
+                  <option value="company">Company</option>
+                  <option value="location">Location</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700">Order:</label>
+                <select
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value)}
+                  className="px-3 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="desc">Newest First</option>
+                  <option value="asc">Oldest First</option>
+                </select>
+              </div>
               <button
                 onClick={handleSearch}
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Search Jobs
+              </button>
+              <button
+                onClick={clearFilters}
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+              >
+                Clear Filters
               </button>
             </div>
           </div>
@@ -146,6 +235,14 @@ export default function Jobs() {
                 </div>
               )}
             </div>
+          )}
+          
+          {!loading && jobs.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={pagination.pages}
+              onPageChange={handlePageChange}
+            />
           )}
         </div>
       </main>

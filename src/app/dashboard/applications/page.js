@@ -33,13 +33,23 @@ export default function Applications() {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const candidateId = payload.userId;
 
-      const res = await fetch(`${API}/api/jobs/applications/${candidateId}`);
+      const params = new URLSearchParams();
+      params.append('page', 1);
+      params.append('limit', 50);
+      params.append('sortBy', 'createdAt');
+      params.append('sortOrder', 'desc');
+
+      const res = await fetch(`${API}/api/jobs/applications/${candidateId}?${params}`);
       if (res.ok) {
         const data = await res.json();
-        setApplications(data);
+        setApplications(data.applications || data || []);
+      } else {
+        console.error('Failed to fetch applications:', res.status);
+        setApplications([]);
       }
     } catch (err) {
-      console.error('Error fetching applications');
+      console.error('Error fetching applications:', err);
+      setApplications([]);
     } finally {
       setLoading(false);
     }

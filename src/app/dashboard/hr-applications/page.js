@@ -38,8 +38,16 @@ export default function HRApplications() {
       // First get HR's jobs, then get applications for those jobs
       const jobsRes = await fetch(`${API}/api/jobs/hr/${hrId}`);
       if (jobsRes.ok) {
-        const jobs = await jobsRes.json();
+        const data = await jobsRes.json();
+        const jobs = data.jobs || data || [];
         console.log('HR Jobs:', jobs);
+        
+        // Ensure jobs is an array
+        if (!Array.isArray(jobs)) {
+          console.error('Jobs data is not an array:', jobs);
+          setApplications([]);
+          return;
+        }
         
         // Get all applications for HR's jobs
         const allApplications = [];
@@ -47,7 +55,8 @@ export default function HRApplications() {
           console.log(`Fetching applications for job ${job.id}:`, job.title);
           const appRes = await fetch(`${API}/api/jobs/${job.id}/applications`);
           if (appRes.ok) {
-            const jobApplications = await appRes.json();
+            const appData = await appRes.json();
+            const jobApplications = appData.applications || appData || [];
             console.log(`Applications for job ${job.id}:`, jobApplications);
             allApplications.push(...jobApplications);
           } else {
