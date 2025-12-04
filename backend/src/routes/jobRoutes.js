@@ -1,5 +1,5 @@
 const express = require("express");
-const { createJob, getJobs, getJobById, updateJob, deleteJob, applyForJob, getApplications, getJobsByHR, getApplicationsByJob, updateApplicationStatus } = require("../controllers/jobController.js");
+const { createJob, getJobs, getJobById, updateJob, deleteJob, applyForJob, getApplications, getJobsByHR, getApplicationsByJob, updateApplicationStatus, deleteApplication } = require("../controllers/jobController.js");
 
 const router = express.Router();
 
@@ -10,6 +10,7 @@ router.get("/applications/:candidateId", getApplications);
 router.get("/hr/:hrId", getJobsByHR);
 router.get("/:jobId/applications", getApplicationsByJob);
 router.put("/applications/:applicationId/status", updateApplicationStatus);
+router.delete("/applications/:applicationId", deleteApplication);
 
 // General routes last
 router.get("/", getJobs);

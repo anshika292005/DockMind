@@ -459,4 +459,36 @@ const updateApplicationStatus = async (req, res) => {
   }
 };
 
-module.exports = { createJob, getJobs, getJobById, updateJob, deleteJob, applyForJob, getApplications, getJobsByHR, getApplicationsByJob, updateApplicationStatus };
+const deleteApplication = async (req, res) => {
+  const { applicationId } = req.params;
+  
+  const appId = parseInt(applicationId);
+  if (!Number.isInteger(appId) || appId < 1) {
+    return res.status(400).json({ message: "Invalid application ID" });
+  }
+  
+  try {
+    const application = await prisma.application.findUnique({
+      where: { id: appId }
+    });
+    
+    if (!application) {
+      return res.status(404).json({ message: "Application not found" });
+    }
+    
+    if (application.status !== 'pending') {
+      return res.status(400).json({ message: "Can only delete pending applications" });
+    }
+    
+    await prisma.application.delete({
+      where: { id: appId }
+    });
+    
+    return res.status(200).json({ message: "Application deleted successfully" });
+  } catch (err) {
+    console.error('Delete application error:', err);
+    return res.status(500).json({ message: "Server Error: " + err.message });
+  }
+};
+
+module.exports = { createJob, getJobs, getJobById, updateJob, deleteJob, applyForJob, getApplications, getJobsByHR, getApplicationsByJob, updateApplicationStatus, deleteApplication };

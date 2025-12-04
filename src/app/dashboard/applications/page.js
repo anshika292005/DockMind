@@ -55,6 +55,28 @@ export default function Applications() {
     }
   };
 
+  const deleteApplication = async (applicationId) => {
+    if (!confirm('Are you sure you want to delete this application?')) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API}/api/jobs/applications/${applicationId}`, {
+        method: 'DELETE'
+      });
+
+      if (res.ok) {
+        setApplications(applications.filter(app => app.id !== applicationId));
+      } else {
+        const error = await res.json();
+        alert(error.message || 'Failed to delete application');
+      }
+    } catch (err) {
+      console.error('Error deleting application:', err);
+      alert('Failed to delete application');
+    }
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending': return 'bg-yellow-100 text-yellow-800';
@@ -186,14 +208,24 @@ export default function Applications() {
                             </div>
                           )}
                           
-                          {application.job.salary && (
-                            <div className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
-                              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                              </svg>
-                              {application.job.salary}
-                            </div>
-                          )}
+                          <div className="flex items-center justify-between">
+                            {application.job.salary && (
+                              <div className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
+                                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                                </svg>
+                                {application.job.salary}
+                              </div>
+                            )}
+                            {application.status === 'pending' && (
+                              <button
+                                onClick={() => deleteApplication(application.id)}
+                                className="px-3 py-1 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
+                              >
+                                Delete Application
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
