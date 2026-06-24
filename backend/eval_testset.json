@@ -1,0 +1,45 @@
+{
+  "sample_document": "sample_policy_handbook.pdf",
+  "questions": [
+    {
+      "question": "What is the standard probation period for new employees?",
+      "reference_answer": "The standard probation period for new employees is 90 days."
+    },
+    {
+      "question": "How many paid vacation days do full-time employees receive each year?",
+      "reference_answer": "Full-time employees receive 15 paid vacation days each year."
+    },
+    {
+      "question": "When must expense reports be submitted?",
+      "reference_answer": "Expense reports must be submitted within 10 business days of the expense."
+    },
+    {
+      "question": "What is the remote work eligibility rule?",
+      "reference_answer": "Employees become eligible for remote work after completing the probation period and receiving manager approval."
+    },
+    {
+      "question": "What is the company reimbursement cap for home office equipment?",
+      "reference_answer": "The company reimburses up to $500 for approved home office equipment."
+    },
+    {
+      "question": "How much notice is required before resigning?",
+      "reference_answer": "Employees are expected to provide at least two weeks of notice before resigning."
+    },
+    {
+      "question": "What is the attendance policy for recurring late arrivals?",
+      "reference_answer": "Recurring late arrivals are addressed through progressive coaching and may lead to formal disciplinary action."
+    },
+    {
+      "question": "Which department approves software purchases above the standard budget?",
+      "reference_answer": "Software purchases above the standard budget require approval from Finance and IT."
+    },
+    {
+      "question": "What is the security rule for handling customer data?",
+      "reference_answer": "Customer data must be stored only in approved systems and never shared through personal email or unencrypted channels."
+    },
+    {
+      "question": "What happens if an employee misses the mandatory annual compliance training deadline?",
+      "reference_answer": "Employees who miss the annual compliance training deadline may lose system access until the training is completed."
+    }
+  ]
+}

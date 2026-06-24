@@ -1,1 +1,48 @@
-node_modules
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.so
+venv/
+env/
+.venv/
+.env
+*.env.local
+
+# ChromaDB data (large binary files)
+chroma_data/
+
+# Backend test files
+backend/test_upload.pdf
+
+# Node / Frontend
+node_modules/
+dist/
+.cache/
+*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker
+*.override.yml
