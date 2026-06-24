@@ -1,0 +1,77 @@
+import axios from 'axios';
+
+const client = axios.create({
+  baseURL: '/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+client.interceptors.request.use((config) => {
+  try {
+    const stored = localStorage.getItem('docmind_settings');
+    const settings = stored ? JSON.parse(stored) : null;
+    if (settings) {
+      if (settings.groqApiKey) {
+        config.headers['X-Groq-Api-Key'] = settings.groqApiKey;
+      }
+      if (settings.model) {
+        config.headers['X-Groq-Model'] = settings.model;
+      }
+    }
+  } catch (e) {
+    console.error('Failed to load settings in interceptor:', e);
+  }
+  return config;
+});
+
+// Generic helper methods used by hooks (returns { success, data } shape)
+async function safeRequest(fn) {
+  try {
+    const res = await fn();
+    return { success: true, data: res.data };
+  } catch (err) {
+    console.error('API error:', err);
+    return { success: false, error: err?.response?.data || err.message };
+  }
+}
+
+export const api = {
+  // Generic REST helpers
+  get: (url) => safeRequest(() => client.get(url)),
+  post: (url, body) => safeRequest(() => client.post(url, body)),
+  delete: (url) => safeRequest(() => client.delete(url)),
+
+  // Documents
+  uploadDocument: async (file) => {
+    const formData = new FormData();
+    formData.append('files', file);
+    return client.post('/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  getDocuments: async () => {
+    return client.get('/documents');
+  },
+  deleteDocument: async (filename) => {
+    return client.delete(`/documents/${encodeURIComponent(filename)}`);
+  },
+  
+  // Evaluation
+  getEvalResults: async () => {
+    return client.get('/eval/results');
+  },
+  runEvaluation: async () => {
+    return client.post('/eval/run');
+  },
+
+  // Deep Research
+  runDeepResearch: async (query, { filename = null, sessionId = null } = {}) => {
+    const body = { question: query };
+    if (filename) body.filename = filename;
+    if (sessionId) body.session_id = sessionId;
+    return client.post('/research', body);
+  },
+};
+
+export default client;
