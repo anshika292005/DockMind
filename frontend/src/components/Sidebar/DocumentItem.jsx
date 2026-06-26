@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { FileText, Trash2, Clock, ChevronDown, ChevronRight, MessageSquare, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useDocuments } from '../../hooks/useDocuments';
 import { useToast } from '../../ui/Toast';
 
 function timeAgo(dateString) {
@@ -13,8 +12,7 @@ function timeAgo(dateString) {
   return `${Math.floor(diff / 86400)}d ago`;
 }
 
-export function DocumentItem({ doc, index, memory }) {
-  const { remove } = useDocuments();
+export function DocumentItem({ doc, index, memory, remove }) {
   const { addToast } = useToast();
   const [deleting, setDeleting] = useState(false);
   const [expanded, setExpanded] = useState(false);
