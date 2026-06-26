@@ -37,29 +37,27 @@ export function useDocuments() {
     try {
       const res = await api.uploadDocument(file);
       const payload = res.data || {};
-
-      await fetchDocuments();
-
-      if (payload.status === 'duplicate') {
-        return {
-          success: true,
-          duplicate: true,
-          doc: {
-            id: payload.filename || file.name,
-            filename: payload.filename || file.name,
-            chunk_count: 0,
-            uploaded_at: new Date().toISOString(),
-          },
-        };
-      }
-
       const newDoc = {
         id: payload.filename || file.name,
         filename: payload.filename || file.name,
         chunk_count: payload.chunks_stored ?? 0,
         uploaded_at: payload.upload_timestamp || new Date().toISOString(),
       };
-      return { success: true, doc: newDoc };
+      setDocuments(prev => {
+        const filtered = prev.filter(doc => doc.filename !== newDoc.filename);
+        return [newDoc, ...filtered];
+      });
+
+      // Refresh in the background so the UI does not stay stuck on a slow list fetch.
+      void fetchDocuments().catch((e) => {
+        console.error('Background document refresh failed:', e);
+      });
+
+      return {
+        success: true,
+        duplicate: payload.status === 'duplicate',
+        doc: newDoc,
+      };
     } catch (e) {
       return { success: false, error: e };
     } finally {
@@ -70,7 +68,9 @@ export function useDocuments() {
   const remove = async (filename) => {
     try {
       await api.deleteDocument(filename);
-      await fetchDocuments();
+      void fetchDocuments().catch((e) => {
+        console.error('Background document refresh failed:', e);
+      });
       return { success: true };
     } catch (e) {
       return { success: false, error: e };
