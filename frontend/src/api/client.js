@@ -63,9 +63,7 @@ export const api = {
   uploadDocument: async (file) => {
     const formData = new FormData();
     formData.append('files', file);
-    return client.post('/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
+    return client.post('/upload', formData);
   },
   getDocuments: async () => {
     return client.get('/documents');

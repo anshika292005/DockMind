@@ -63,7 +63,6 @@ class RagService:
         )
         self._embedder = SentenceTransformer(
             resolve_embedding_model_path(),
-            local_files_only=True,
         )
         self._llm = None
 

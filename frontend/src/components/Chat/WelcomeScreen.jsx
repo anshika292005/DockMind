@@ -1,11 +1,12 @@
 import React from 'react';
-import { Sparkles, FileText, Globe, BarChart2 } from 'lucide-react';
+import { Sparkles, FileText, Globe, BarChart2, List } from 'lucide-react';
 
 const suggestions = [
   { icon: FileText, text: 'Summarize the key findings in this document' },
   { icon: Globe, text: 'What are the main policy changes mentioned?' },
   { icon: BarChart2, text: 'Extract all statistics and data points' },
   { icon: Sparkles, text: 'What conclusions does the author draw?' },
+  { icon: List, text: 'List all action items or recommendations mentioned' },
 ];
 
 export function WelcomeScreen({ onSuggestionClick }) {

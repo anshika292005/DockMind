@@ -34,7 +34,6 @@ class PdfIngestionService:
         )
         self._embedder = SentenceTransformer(
             resolve_embedding_model_path(),
-            local_files_only=True,
         )
         self._embedding_dimension = int(
             self._embedder.get_sentence_embedding_dimension()

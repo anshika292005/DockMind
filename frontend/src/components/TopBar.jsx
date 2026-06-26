@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, PanelRight, Sparkles, Settings, Github } from 'lucide-react';
+import { Menu, PanelRight, Sparkles, Settings, ExternalLink } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 
 export function TopBar({ onToggleSidebar, onToggleSources, onOpenSettings }) {
@@ -35,7 +35,7 @@ export function TopBar({ onToggleSidebar, onToggleSources, onOpenSettings }) {
           title="View on GitHub"
           className="p-1.5 text-text-muted hover:text-text-primary hover:bg-border rounded transition-colors"
         >
-          <Github size={17} />
+          <ExternalLink size={17} />
         </a>
 
         {/* Settings */}
@@ -66,4 +66,3 @@ export function TopBar({ onToggleSidebar, onToggleSources, onOpenSettings }) {
     </div>
   );
 }
-
