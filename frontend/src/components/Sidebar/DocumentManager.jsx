@@ -6,7 +6,7 @@ import { FileUp, Files, Brain } from 'lucide-react';
 import { useToast } from '../../ui/Toast';
 
 export function DocumentManager({ memory }) {
-  const { documents, loading, upload } = useDocuments();
+  const { documents, loading, upload, uploading, remove } = useDocuments();
   const [isDragging, setIsDragging] = useState(false);
   const { addToast } = useToast();
 
@@ -77,7 +77,13 @@ export function DocumentManager({ memory }) {
           ) : (
             <div className="space-y-1">
               {documents.map((doc, idx) => (
-                <DocumentItem key={doc.id || doc.filename} doc={doc} index={idx} memory={memory} />
+                <DocumentItem
+                  key={doc.id || doc.filename}
+                  doc={doc}
+                  index={idx}
+                  memory={memory}
+                  remove={remove}
+                />
               ))}
             </div>
           )}
@@ -114,7 +120,7 @@ export function DocumentManager({ memory }) {
         )}
       </div>
 
-      <UploadZone />
+      <UploadZone upload={upload} uploading={uploading} />
 
       {isDragging && (
         <div className="absolute inset-0 z-50 bg-violet/10 border-2 border-violet border-dashed flex items-center justify-center rounded-lg m-2 backdrop-blur-sm pointer-events-none">
