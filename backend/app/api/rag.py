@@ -1,11 +1,14 @@
 import json
+from time import perf_counter
 
 from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import StreamingResponse
 
+from app.core.config import settings
 from app.models.documents import DeleteDocumentResponse, DocumentsListResponse
 from app.models.query import QueryRequest, QueryResponse
 from app.services.rag import GroqRateLimitError, RagConfigurationError, RagService
+from app.services.telemetry import telemetry_service
 
 
 router = APIRouter(tags=["rag"])
@@ -29,11 +32,22 @@ def sse_event(payload: dict[str, object]) -> str:
 async def query_documents(
     payload: QueryRequest,
 ) -> QueryResponse:
+    started_at = perf_counter()
     try:
-        return get_rag_service().answer_question(
+        response = get_rag_service().answer_question(
             question=payload.question,
             top_k=payload.top_k,
         )
+        telemetry_service.record_query(
+            question=payload.question,
+            top_k=payload.top_k,
+            retrieved_chunks=len(response.citations),
+            confidence=response.confidence,
+            answer_length=len(response.answer),
+            duration_ms=(perf_counter() - started_at) * 1000,
+            streamed=False,
+        )
+        return response
     except RagConfigurationError as exc:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -56,10 +70,12 @@ async def query_documents(
 async def stream_query(
     payload: QueryRequest,
 ) -> StreamingResponse:
+    question = payload.question
+    top_k = payload.top_k
     try:
         citations, token_stream = get_rag_service().stream_answer(
-            question=payload.question,
-            top_k=payload.top_k,
+            question=question,
+            top_k=top_k,
         )
     except RagConfigurationError as exc:
         raise HTTPException(
@@ -78,7 +94,10 @@ async def stream_query(
             headers=headers,
         ) from exc
 
+    started_at = perf_counter()
+
     def event_generator():
+        token_count = 0
         yield sse_event(
             {
                 "type": "citations",
@@ -88,24 +107,32 @@ async def stream_query(
 
         try:
             for token in token_stream:
+                token_count += 1
                 yield sse_event({"type": "token", "content": token})
         except Exception as exc:
             if get_rag_service()._is_rate_limit_error(exc):
-                payload = {
+                error_payload = {
                     "type": "error",
                     "error": "groq_rate_limit_exceeded",
                     "message": "Groq rate limit exceeded. Please retry after the reset window.",
                     "retry_after": get_rag_service()._retry_after(exc),
                 }
             else:
-                payload = {
+                error_payload = {
                     "type": "error",
                     "error": "stream_failed",
                     "message": str(exc),
                 }
-            yield sse_event(payload)
+            yield sse_event(error_payload)
             return
 
+        telemetry_service.record_stream(
+            question=question,
+            top_k=top_k,
+            citations_count=len(citations),
+            token_count=token_count,
+            duration_ms=(perf_counter() - started_at) * 1000,
+        )
         yield sse_event({"type": "done"})
 
     return StreamingResponse(
