@@ -1,11 +1,9 @@
 import React, { useRef } from 'react';
 import { UploadCloud } from 'lucide-react';
-import { useDocuments } from '../../hooks/useDocuments';
 import { useToast } from '../../ui/Toast';
 
-export function UploadZone() {
+export function UploadZone({ upload, uploading }) {
   const fileInputRef = useRef(null);
-  const { upload, uploading } = useDocuments();
   const { addToast } = useToast();
 
   const handleFileChange = async (e) => {
@@ -14,15 +12,20 @@ export function UploadZone() {
     
     if (file.type !== 'application/pdf') {
       addToast({ message: 'Only PDF files are supported.', type: 'error' });
+      if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
 
     const res = await upload(file);
-    if (res.success) {
+    if (res.success && res.duplicate) {
+      addToast({ message: `${file.name} was already uploaded`, type: 'info' });
+    } else if (res.success) {
       addToast({ message: `PDF uploaded — ${res.doc.chunk_count} chunks stored`, type: 'success' });
     } else {
       addToast({ message: 'Upload failed. Try again.', type: 'error' });
     }
+    
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   return (
