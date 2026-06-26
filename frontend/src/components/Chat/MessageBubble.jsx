@@ -1,8 +1,17 @@
 import React from 'react';
-import { FileText, Copy, Check } from 'lucide-react';
+import { FileText, Copy, Check, Clock } from 'lucide-react';
 import { ThinkingAnimation } from './ThinkingAnimation';
 
-export function MessageBubble({ message, onCitationClick }) {
+function formatTime(iso) {
+  if (!iso) return '';
+  try {
+    return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  } catch {
+    return '';
+  }
+}
+
+export function MessageBubble({ message, onCitationClick, timestamp }) {
   const isUser = message.role === 'user';
   const [copied, setCopied] = React.useState(false);
 
@@ -42,15 +51,22 @@ export function MessageBubble({ message, onCitationClick }) {
           </div>
         )}
 
-        {/* Copy button for assistant messages */}
+        {/* Copy button and timestamp for assistant messages */}
         {!isUser && !message.isStreaming && message.content && !message.isError && (
-          <button
-            onClick={handleCopy}
-            className="mt-2 flex items-center gap-1.5 text-xs text-text-muted hover:text-text-primary opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            {copied ? <Check size={12} className="text-teal" /> : <Copy size={12} />}
-            {copied ? 'Copied' : 'Copy'}
-          </button>
+          <div className="mt-2 flex items-center gap-3">
+            <button
+              onClick={handleCopy}
+              className="flex items-center gap-1.5 text-xs text-text-muted hover:text-text-primary opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              {copied ? <Check size={12} className="text-teal" /> : <Copy size={12} />}
+              {copied ? 'Copied' : 'Copy'}
+            </button>
+            {timestamp && (
+              <span className="flex items-center gap-1 text-[10px] text-text-muted opacity-0 group-hover:opacity-60 transition-opacity">
+                <Clock size={10} />{formatTime(timestamp)}
+              </span>
+            )}
+          </div>
         )}
 
         {/* Citations */}
