@@ -35,7 +35,9 @@ export function DocumentManager({ memory }) {
     }
 
     const res = await upload(file);
-    if (res.success) {
+    if (res.success && res.duplicate) {
+      addToast({ message: `${file.name} was already uploaded`, type: 'info' });
+    } else if (res.success) {
       addToast({ message: `PDF uploaded — ${res.doc.chunk_count} chunks stored`, type: 'success' });
     } else {
       addToast({ message: 'Upload failed. Try again.', type: 'error' });
@@ -61,6 +63,11 @@ export function DocumentManager({ memory }) {
             <h2 className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">
               Documents & Chats
             </h2>
+            {documents.length > 0 && (
+              <span className="ml-auto text-[10px] font-mono bg-violet/10 text-violet px-1.5 py-0.5 rounded-full">
+                {documents.length}
+              </span>
+            )}
           </div>
 
           {loading ? (
