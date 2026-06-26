@@ -15,6 +15,7 @@ from ragas.llms import LangchainLLMWrapper
 from ragas.metrics import answer_relevancy, context_recall, faithfulness
 from sentence_transformers import SentenceTransformer
 
+from app.core.embeddings import resolve_embedding_model_path
 from app.core.config import settings
 from app.services.rag import RagService
 
@@ -35,7 +36,10 @@ class EvaluationThresholds:
 
 class SentenceTransformerEmbeddings(Embeddings):
     def __init__(self, model_name: str) -> None:
-        self._model = SentenceTransformer(model_name)
+        self._model = SentenceTransformer(
+            resolve_embedding_model_path(),
+            local_files_only=True,
+        )
 
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
         embeddings = self._model.encode(

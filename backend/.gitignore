@@ -9,3 +9,4 @@ venv/
 chroma_data/
 uploads/
 *.log
+telemetry_events.jsonl
