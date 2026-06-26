@@ -29,12 +29,21 @@ class EvaluationService:
         return payload
 
     def run_evaluation_job(self) -> None:
-        from evaluate_rag import run_evaluation
-
         self._write_status({"status": "running", "error": None, "started_at": utc_now()})
 
         try:
+            from evaluate_rag import run_evaluation
+
             run_evaluation()
+        except ModuleNotFoundError as exc:
+            self._write_status(
+                {
+                    "status": "failed",
+                    "error": f"Evaluation dependencies are not installed: {exc}",
+                    "finished_at": utc_now(),
+                }
+            )
+            return
         except Exception as exc:
             self._write_status(
                 {
