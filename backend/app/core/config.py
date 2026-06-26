@@ -22,6 +22,9 @@ class Settings:
     embedding_model_name: str = "sentence-transformers/all-MiniLM-L6-v2"
     chunk_size: int = 512
     chunk_overlap: int = 100
+    retrieval_candidate_multiplier: int = int(os.getenv("RETRIEVAL_CANDIDATE_MULTIPLIER", "4"))
+    retrieval_min_candidates: int = int(os.getenv("RETRIEVAL_MIN_CANDIDATES", "12"))
+    retrieval_rrf_k: int = int(os.getenv("RETRIEVAL_RRF_K", "60"))
     stream_artificial_delay_ms: int = int(os.getenv("STREAM_ARTIFICIAL_DELAY_MS", "0"))
     eval_results_path: str = os.getenv("EVAL_RESULTS_PATH", "./eval_results.json")
     eval_status_path: str = os.getenv("EVAL_STATUS_PATH", "./eval_status.json")
