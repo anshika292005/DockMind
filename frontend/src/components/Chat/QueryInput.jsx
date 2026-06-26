@@ -5,6 +5,13 @@ export function QueryInput({ query, setQuery, onSend, disabled, placeholder = 'A
   const textareaRef = useRef(null);
 
   const handleKeyDown = (e) => {
+    // Enter without shift sends the message; Shift+Enter inserts a newline
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (!disabled && query.trim()) onSend();
+      return;
+    }
+    // Also support Cmd/Ctrl+Enter for power users
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
       e.preventDefault();
       onSend();
@@ -43,6 +50,11 @@ export function QueryInput({ query, setQuery, onSend, disabled, placeholder = 'A
       >
         <Send size={16} />
       </button>
+      {query.length > 0 && (
+        <p className="absolute -bottom-5 right-1 text-[10px] text-text-muted select-none">
+          Enter to send · Shift+Enter for newline
+        </p>
+      )}
     </div>
   );
 }
