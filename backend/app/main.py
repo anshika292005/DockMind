@@ -20,6 +20,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=sorted(set([settings.frontend_origin, *settings.frontend_origins])),
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -54,4 +55,4 @@ async def record_http_request(request, call_next):
 
 @app.get("/health", tags=["system"])
 async def health_check() -> dict[str, str]:
-    return {"status": "ok"}
+    return {"status": "ok", "version": "0.1.0", "service": settings.app_name}
