@@ -8,9 +8,10 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BAS
 
 export function buildApiUrl(path) {
   if (!path) return API_BASE_URL;
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  const cleanPath = path.startsWith('/api') ? path.slice(4) : path;
+  const normalizedPath = cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`;
   if (/^https?:\/\//i.test(API_BASE_URL)) {
-    return new URL(normalizedPath, API_BASE_URL).toString();
+    return `${API_BASE_URL.replace(/\/$/, '')}${normalizedPath}`;
   }
   return `${API_BASE_URL.replace(/\/$/, '')}${normalizedPath}`;
 }
