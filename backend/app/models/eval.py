@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class EvalMetricSummary(BaseModel):
@@ -20,8 +20,11 @@ class EvalResultsResponse(BaseModel):
     status: str
     last_evaluated_at: str | None = None
     sample_document: str | None = None
+    question_count: int | None = None
     metrics: EvalMetricSummary | None = None
-    per_question: list[EvalQuestionResult] = []
+    thresholds: dict[str, float] | None = None
+    regression_passed: bool | None = None
+    per_question: list[EvalQuestionResult] = Field(default_factory=list)
     error: str | None = None
 
 
