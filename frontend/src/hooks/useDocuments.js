@@ -36,13 +36,29 @@ export function useDocuments() {
     setUploading(true);
     try {
       const res = await api.uploadDocument(file);
+      const payload = res.data || {};
+
+      await fetchDocuments();
+
+      if (payload.status === 'duplicate') {
+        return {
+          success: true,
+          duplicate: true,
+          doc: {
+            id: payload.filename || file.name,
+            filename: payload.filename || file.name,
+            chunk_count: 0,
+            uploaded_at: new Date().toISOString(),
+          },
+        };
+      }
+
       const newDoc = {
-        id: Date.now(),
-        filename: res.data.filename || file.name,
-        chunk_count: res.data.chunks_stored ?? 0,
-        uploaded_at: new Date().toISOString()
+        id: payload.filename || file.name,
+        filename: payload.filename || file.name,
+        chunk_count: payload.chunks_stored ?? 0,
+        uploaded_at: payload.upload_timestamp || new Date().toISOString(),
       };
-      setDocuments(prev => [...prev, newDoc]);
       return { success: true, doc: newDoc };
     } catch (e) {
       return { success: false, error: e };
@@ -54,7 +70,7 @@ export function useDocuments() {
   const remove = async (filename) => {
     try {
       await api.deleteDocument(filename);
-      setDocuments(prev => prev.filter(d => d.filename !== filename));
+      await fetchDocuments();
       return { success: true };
     } catch (e) {
       return { success: false, error: e };
