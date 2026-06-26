@@ -8,6 +8,7 @@ from typing import Any, Iterator
 
 from pydantic import BaseModel, Field, ValidationError
 
+from app.core.embeddings import resolve_embedding_model_path
 from app.core.config import settings
 from app.models.documents import DocumentSummary
 from app.models.query import Citation, QueryResponse
@@ -60,7 +61,10 @@ class RagService:
         self._uploads_collection = self._chroma_client.get_or_create_collection(
             settings.chroma_uploads_collection,
         )
-        self._embedder = SentenceTransformer(settings.embedding_model_name)
+        self._embedder = SentenceTransformer(
+            resolve_embedding_model_path(),
+            local_files_only=True,
+        )
         self._llm = None
 
     def _configure_llm(self):

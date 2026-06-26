@@ -6,6 +6,7 @@ from pathlib import Path
 
 from fastapi import UploadFile
 
+from app.core.embeddings import resolve_embedding_model_path
 from app.core.config import settings
 
 
@@ -31,7 +32,10 @@ class PdfIngestionService:
         self._uploads_collection = self._chroma_client.get_or_create_collection(
             settings.chroma_uploads_collection,
         )
-        self._embedder = SentenceTransformer(settings.embedding_model_name)
+        self._embedder = SentenceTransformer(
+            resolve_embedding_model_path(),
+            local_files_only=True,
+        )
         self._embedding_dimension = int(
             self._embedder.get_sentence_embedding_dimension()
         )
