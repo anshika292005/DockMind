@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, PanelRight, Sparkles, Settings } from 'lucide-react';
+import { Menu, PanelRight, Sparkles, Settings, Github } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 
 export function TopBar({ onToggleSidebar, onToggleSources, onOpenSettings }) {
@@ -27,6 +27,17 @@ export function TopBar({ onToggleSidebar, onToggleSources, onOpenSettings }) {
       </div>
 
       <div className="flex items-center gap-2">
+        {/* GitHub link */}
+        <a
+          href="https://github.com/anshika292005/DockMind"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="View on GitHub"
+          className="p-1.5 text-text-muted hover:text-text-primary hover:bg-border rounded transition-colors"
+        >
+          <Github size={17} />
+        </a>
+
         {/* Settings */}
         <button
           onClick={onOpenSettings}
@@ -55,3 +66,4 @@ export function TopBar({ onToggleSidebar, onToggleSources, onOpenSettings }) {
     </div>
   );
 }
+
