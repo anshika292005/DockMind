@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { buildApiUrl } from '../api/client';
 
 const SESSION_KEY_DOCS = 'docmind_messages_docs';
 const SESSION_KEY_RESEARCH = 'docmind_messages_research';
@@ -70,7 +71,7 @@ export function useStreamQuery() {
       if (filename) body.filename = filename;
       if (sessionId) body.session_id = sessionId;
 
-      const response = await fetch('/api/query/stream', {
+      const response = await fetch(buildApiUrl('/query/stream'), {
         method: 'POST',
         headers,
         body: JSON.stringify(body),

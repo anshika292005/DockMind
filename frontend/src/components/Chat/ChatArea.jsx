@@ -7,7 +7,7 @@ import { WelcomeScreen } from './WelcomeScreen';
 import { useStreamQuery } from '../../hooks/useStreamQuery';
 import { useToast } from '../../ui/Toast';
 import { Trash2, FileText, MessageSquare } from 'lucide-react';
-import { api } from '../../api/client';
+import { api, buildApiUrl } from '../../api/client';
 
 export function ChatArea({ activeTab, setActiveTab, memory }) {
   const [query, setQuery] = useState('');
@@ -34,7 +34,7 @@ export function ChatArea({ activeTab, setActiveTab, memory }) {
     const loadHistory = async () => {
       setLoadingHistory(true);
       try {
-        const res = await fetch(`/api/sessions/${activeSessionId}/messages`);
+        const res = await fetch(buildApiUrl(`/sessions/${activeSessionId}/messages`));
         if (res.ok) {
           const data = await res.json();
           setHistoryMessages(data || []);
