@@ -1,9 +1,8 @@
 import json
 
-from fastapi import APIRouter, HTTPException, status, Header
+from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import StreamingResponse
 
-from app.core.config import settings
 from app.models.documents import DeleteDocumentResponse, DocumentsListResponse
 from app.models.query import QueryRequest, QueryResponse
 from app.services.rag import GroqRateLimitError, RagConfigurationError, RagService
@@ -29,16 +28,11 @@ def sse_event(payload: dict[str, object]) -> str:
 @router.post("/query", response_model=QueryResponse)
 async def query_documents(
     payload: QueryRequest,
-    x_groq_api_key: str | None = Header(default=None),
-    x_groq_model: str | None = Header(default=None),
 ) -> QueryResponse:
     try:
         return get_rag_service().answer_question(
             question=payload.question,
             top_k=payload.top_k,
-            api_key=x_groq_api_key,
-            model=x_groq_model,
-            filename=payload.filename,
         )
     except RagConfigurationError as exc:
         raise HTTPException(
@@ -61,16 +55,11 @@ async def query_documents(
 @router.post("/query/stream")
 async def stream_query(
     payload: QueryRequest,
-    x_groq_api_key: str | None = Header(default=None),
-    x_groq_model: str | None = Header(default=None),
 ) -> StreamingResponse:
     try:
         citations, token_stream = get_rag_service().stream_answer(
             question=payload.question,
             top_k=payload.top_k,
-            api_key=x_groq_api_key,
-            model=x_groq_model,
-            filename=payload.filename,
         )
     except RagConfigurationError as exc:
         raise HTTPException(
