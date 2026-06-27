@@ -60,10 +60,12 @@ export const api = {
   delete: (url) => safeRequest(() => client.delete(url)),
 
   // Documents
-  uploadDocument: async (file) => {
+  uploadDocument: async (file, { onUploadProgress } = {}) => {
     const formData = new FormData();
     formData.append('files', file);
-    return client.post('/upload', formData);
+    return client.post('/upload', formData, {
+      onUploadProgress,
+    });
   },
   getDocuments: async () => {
     return client.get('/documents');

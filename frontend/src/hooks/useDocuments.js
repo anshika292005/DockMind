@@ -5,6 +5,8 @@ export function useDocuments() {
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStatus, setUploadStatus] = useState('idle');
 
   const fetchDocuments = useCallback(async () => {
     setLoading(true);
@@ -34,8 +36,23 @@ export function useDocuments() {
 
   const upload = async (file) => {
     setUploading(true);
+    setUploadProgress(0);
+    setUploadStatus('uploading');
     try {
-      const res = await api.uploadDocument(file);
+      const res = await api.uploadDocument(file, {
+        onUploadProgress: (event) => {
+          if (!event.total) return;
+          const percent = Math.min(
+            99,
+            Math.round((event.loaded / event.total) * 100)
+          );
+          setUploadProgress(percent);
+        },
+      });
+
+      setUploadStatus('processing');
+      setUploadProgress(100);
+
       const payload = res.data || {};
       const newDoc = {
         id: payload.filename || file.name,
@@ -59,9 +76,12 @@ export function useDocuments() {
         doc: newDoc,
       };
     } catch (e) {
+      setUploadStatus('error');
       return { success: false, error: e };
     } finally {
       setUploading(false);
+      setUploadProgress(0);
+      setUploadStatus('idle');
     }
   };
 
@@ -77,5 +97,14 @@ export function useDocuments() {
     }
   };
 
-  return { documents, loading, uploading, upload, remove, refresh: fetchDocuments };
+  return {
+    documents,
+    loading,
+    uploading,
+    uploadProgress,
+    uploadStatus,
+    upload,
+    remove,
+    refresh: fetchDocuments,
+  };
 }

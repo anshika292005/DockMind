@@ -21,6 +21,12 @@ def get_ingestion_service() -> PdfIngestionService:
 
 @router.post("/upload")
 async def upload_pdfs(files: list[UploadFile] = File(...)) -> dict[str, object]:
+    if len(files) != 1:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Upload one PDF at a time.",
+        )
+
     results: list[dict[str, object]] = []
     service = get_ingestion_service()
 

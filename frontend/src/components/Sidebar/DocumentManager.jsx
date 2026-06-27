@@ -6,7 +6,7 @@ import { FileUp, Files, Brain } from 'lucide-react';
 import { useToast } from '../../ui/Toast';
 
 export function DocumentManager({ memory }) {
-  const { documents, loading, upload, uploading, remove } = useDocuments();
+  const { documents, loading, upload, uploading, uploadProgress, uploadStatus, remove } = useDocuments();
   const [isDragging, setIsDragging] = useState(false);
   const { addToast } = useToast();
 
@@ -26,8 +26,14 @@ export function DocumentManager({ memory }) {
     e.preventDefault();
     setIsDragging(false);
     
-    const file = e.dataTransfer.files[0];
+    const files = Array.from(e.dataTransfer.files || []);
+    const file = files[0];
     if (!file) return;
+
+    if (files.length > 1) {
+      addToast({ message: 'Upload one PDF at a time.', type: 'error' });
+      return;
+    }
 
     if (file.type !== 'application/pdf') {
       addToast({ message: 'Only PDF files are supported.', type: 'error' });
@@ -127,7 +133,12 @@ export function DocumentManager({ memory }) {
         )}
       </div>
 
-      <UploadZone upload={upload} uploading={uploading} />
+      <UploadZone
+        upload={upload}
+        uploading={uploading}
+        uploadProgress={uploadProgress}
+        uploadStatus={uploadStatus}
+      />
 
       {isDragging && (
         <div className="absolute inset-0 z-50 bg-violet/10 border-2 border-violet border-dashed flex items-center justify-center rounded-lg m-2 backdrop-blur-sm pointer-events-none">
