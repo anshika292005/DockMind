@@ -41,6 +41,10 @@ class PdfIngestionService:
 
     async def ingest_pdf(self, file: UploadFile) -> dict[str, object]:
         filename = Path(file.filename or "uploaded.pdf").name
+        return self.ingest_pdf_bytes(filename=filename, file_bytes=await file.read())
+
+    def ingest_pdf_bytes(self, filename: str, file_bytes: bytes) -> dict[str, object]:
+        filename = Path(filename or "uploaded.pdf").name
         if not filename.lower().endswith(".pdf"):
             raise ValueError(f"{filename} is not a PDF file")
 
@@ -54,7 +58,7 @@ class PdfIngestionService:
             from pypdf import PdfReader
 
             temp_path = Path(temp_dir) / filename
-            temp_path.write_bytes(await file.read())
+            temp_path.write_bytes(file_bytes)
 
             reader = PdfReader(str(temp_path))
             chunks: list[dict[str, object]] = []

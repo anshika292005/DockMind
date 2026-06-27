@@ -28,6 +28,33 @@ export function useDocuments() {
     }, 700);
   }, [stopUploadProgressTimer]);
 
+  const waitForUploadJob = useCallback(async (jobId) => {
+    const startedAt = Date.now();
+    const timeoutMs = 10 * 60 * 1000;
+
+    while (Date.now() - startedAt < timeoutMs) {
+      const res = await api.getUploadJob(jobId);
+      const job = res.data || {};
+      const progress = Number(job.progress);
+
+      if (Number.isFinite(progress)) {
+        setUploadProgress(Math.max(95, Math.min(progress, 100)));
+      }
+
+      if (job.status === 'success' || job.status === 'duplicate') {
+        return job.result || job;
+      }
+
+      if (job.status === 'error') {
+        throw new Error(job.message || 'Upload processing failed.');
+      }
+
+      await new Promise(resolve => window.setTimeout(resolve, 2000));
+    }
+
+    throw new Error('Upload processing timed out. Please try a smaller PDF.');
+  }, []);
+
   const fetchDocuments = useCallback(async () => {
     setLoading(true);
     try {
@@ -85,9 +112,14 @@ export function useDocuments() {
 
       stopUploadProgressTimer();
       setUploadStatus('processing');
-      setUploadProgress(100);
+      setUploadProgress(95);
 
-      const payload = res.data || {};
+      const uploadPayload = res.data || {};
+      const payload = uploadPayload.job_id
+        ? await waitForUploadJob(uploadPayload.job_id)
+        : uploadPayload;
+
+      setUploadProgress(100);
       const newDoc = {
         id: payload.filename || file.name,
         filename: payload.filename || file.name,

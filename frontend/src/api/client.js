@@ -62,7 +62,12 @@ export const api = {
     formData.append('files', file);
     return client.post('/upload', formData, {
       onUploadProgress,
-      timeout: 300000,
+      timeout: 120000,
+    });
+  },
+  getUploadJob: async (jobId) => {
+    return client.get(`/upload/jobs/${encodeURIComponent(jobId)}`, {
+      timeout: 30000,
     });
   },
   getDocuments: async () => {
