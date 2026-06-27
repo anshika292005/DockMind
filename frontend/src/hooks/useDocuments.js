@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { api } from '../api/client';
 
 export function useDocuments() {
@@ -7,6 +7,26 @@ export function useDocuments() {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadStatus, setUploadStatus] = useState('idle');
+  const uploadProgressTimerRef = useRef(null);
+
+  const stopUploadProgressTimer = useCallback(() => {
+    if (uploadProgressTimerRef.current) {
+      window.clearInterval(uploadProgressTimerRef.current);
+      uploadProgressTimerRef.current = null;
+    }
+  }, []);
+
+  const startUploadProgressTimer = useCallback(() => {
+    stopUploadProgressTimer();
+    uploadProgressTimerRef.current = window.setInterval(() => {
+      setUploadProgress(prev => {
+        if (prev >= 90) return prev;
+        if (prev < 15) return prev + 2;
+        if (prev < 55) return prev + 1;
+        return Math.min(prev + 0.5, 90);
+      });
+    }, 700);
+  }, [stopUploadProgressTimer]);
 
   const fetchDocuments = useCallback(async () => {
     setLoading(true);
@@ -34,22 +54,36 @@ export function useDocuments() {
     fetchDocuments();
   }, [fetchDocuments]);
 
+  useEffect(() => {
+    return () => stopUploadProgressTimer();
+  }, [stopUploadProgressTimer]);
+
   const upload = async (file) => {
     setUploading(true);
-    setUploadProgress(0);
-    setUploadStatus('uploading');
+    setUploadProgress(8);
+    setUploadStatus('connecting');
+    startUploadProgressTimer();
     try {
       const res = await api.uploadDocument(file, {
         onUploadProgress: (event) => {
-          if (!event.total) return;
-          const percent = Math.min(
-            99,
-            Math.round((event.loaded / event.total) * 100)
-          );
-          setUploadProgress(percent);
+          setUploadStatus('uploading');
+          if (!event.total) {
+            setUploadProgress(prev => Math.max(prev, 25));
+            return;
+          }
+
+          const percent = Math.round((event.loaded / event.total) * 100);
+          if (percent >= 100) {
+            setUploadStatus('processing');
+            setUploadProgress(prev => Math.max(prev, 95));
+            return;
+          }
+
+          setUploadProgress(prev => Math.max(prev, Math.min(percent, 95)));
         },
       });
 
+      stopUploadProgressTimer();
       setUploadStatus('processing');
       setUploadProgress(100);
 
@@ -76,6 +110,7 @@ export function useDocuments() {
         doc: newDoc,
       };
     } catch (e) {
+      stopUploadProgressTimer();
       setUploadStatus('error');
       return { success: false, error: e };
     } finally {
