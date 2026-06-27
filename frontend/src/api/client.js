@@ -65,6 +65,7 @@ export const api = {
     formData.append('files', file);
     return client.post('/upload', formData, {
       onUploadProgress,
+      timeout: 300000,
     });
   },
   getDocuments: async () => {

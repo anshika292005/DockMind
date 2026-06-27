@@ -49,7 +49,6 @@ class RetrievedChunk:
 class RagService:
     def __init__(self) -> None:
         import chromadb
-        from sentence_transformers import SentenceTransformer
 
         self._data_dir = Path(__file__).resolve().parents[2] / "chroma_data"
         self._data_dir.mkdir(parents=True, exist_ok=True)
@@ -61,10 +60,17 @@ class RagService:
         self._uploads_collection = self._chroma_client.get_or_create_collection(
             settings.chroma_uploads_collection,
         )
-        self._embedder = SentenceTransformer(
-            resolve_embedding_model_path(),
-        )
+        self._embedder = None
         self._llm = None
+
+    def _configure_embedder(self):
+        if self._embedder is not None:
+            return self._embedder
+
+        from sentence_transformers import SentenceTransformer
+
+        self._embedder = SentenceTransformer(resolve_embedding_model_path())
+        return self._embedder
 
     def _configure_llm(self):
         if self._llm is not None:
@@ -186,12 +192,13 @@ class RagService:
         return len(chunk_ids)
 
     def _retrieve_chunks(self, question: str, top_k: int) -> list[RetrievedChunk]:
+        embedder = self._configure_embedder()
         candidate_count = max(
             top_k * max(1, int(settings.retrieval_candidate_multiplier)),
             int(settings.retrieval_min_candidates),
         )
 
-        query_embedding = self._embedder.encode(
+        query_embedding = embedder.encode(
             [question],
             normalize_embeddings=True,
             show_progress_bar=False,
