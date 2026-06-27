@@ -6,7 +6,7 @@ from pathlib import Path
 
 from fastapi import UploadFile
 
-from app.core.embeddings import resolve_embedding_model_path
+from app.core.embeddings import create_embedding_model
 from app.core.config import settings
 
 
@@ -20,7 +20,6 @@ class DuplicateUploadError(Exception):
 class PdfIngestionService:
     def __init__(self) -> None:
         import chromadb
-        from sentence_transformers import SentenceTransformer
 
         self._data_dir = Path(__file__).resolve().parents[2] / "chroma_data"
         self._data_dir.mkdir(parents=True, exist_ok=True)
@@ -32,9 +31,7 @@ class PdfIngestionService:
         self._uploads_collection = self._chroma_client.get_or_create_collection(
             settings.chroma_uploads_collection,
         )
-        self._embedder = SentenceTransformer(
-            resolve_embedding_model_path(),
-        )
+        self._embedder = create_embedding_model()
         self._embedding_dimension = int(
             self._embedder.get_sentence_embedding_dimension()
         )
@@ -93,7 +90,10 @@ class PdfIngestionService:
                 self._docs_collection.add(
                     ids=[str(chunk["id"]) for chunk in chunks],
                     documents=[str(chunk["text"]) for chunk in chunks],
-                    embeddings=[embedding.tolist() for embedding in embeddings],
+                    embeddings=[
+                        embedding.tolist() if hasattr(embedding, "tolist") else list(embedding)
+                        for embedding in embeddings
+                    ],
                     metadatas=[
                         {
                             "filename": filename,

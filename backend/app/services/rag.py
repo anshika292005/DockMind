@@ -8,7 +8,7 @@ from typing import Any, Iterator
 
 from pydantic import BaseModel, Field, ValidationError
 
-from app.core.embeddings import resolve_embedding_model_path
+from app.core.embeddings import create_embedding_model
 from app.core.config import settings
 from app.models.documents import DocumentSummary
 from app.models.query import Citation, QueryResponse
@@ -67,9 +67,7 @@ class RagService:
         if self._embedder is not None:
             return self._embedder
 
-        from sentence_transformers import SentenceTransformer
-
-        self._embedder = SentenceTransformer(resolve_embedding_model_path())
+        self._embedder = create_embedding_model()
         return self._embedder
 
     def _configure_llm(self):
@@ -198,11 +196,16 @@ class RagService:
             int(settings.retrieval_min_candidates),
         )
 
-        query_embedding = embedder.encode(
+        encoded_query = embedder.encode(
             [question],
             normalize_embeddings=True,
             show_progress_bar=False,
-        )[0].tolist()
+        )[0]
+        query_embedding = (
+            encoded_query.tolist()
+            if hasattr(encoded_query, "tolist")
+            else list(encoded_query)
+        )
 
         results = self._docs_collection.query(
             query_embeddings=[query_embedding],

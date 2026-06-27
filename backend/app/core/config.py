@@ -28,6 +28,8 @@ class Settings:
     groq_model: str = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
     tavily_api_key: str | None = os.getenv("TAVILY_API_KEY")
     embedding_model_name: str = "sentence-transformers/all-MiniLM-L6-v2"
+    use_hf_embeddings: bool = os.getenv("USE_HF_EMBEDDINGS", "false").lower() == "true"
+    embedding_dimension: int = int(os.getenv("EMBEDDING_DIMENSION", "384"))
     chunk_size: int = 512
     chunk_overlap: int = 100
     retrieval_candidate_multiplier: int = int(os.getenv("RETRIEVAL_CANDIDATE_MULTIPLIER", "4"))
